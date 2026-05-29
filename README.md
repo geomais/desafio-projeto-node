@@ -1,12 +1,23 @@
 # GeoProjetoDigital
 
-API em Node.js e TypeScript para simular uma plataforma de aprovação digital de projetos imobiliários e urbanísticos.
+API em Node.js e TypeScript para simular uma plataforma de aprovação digital de projetos imobiliários e urbanísticos. Possibilitando consultar projetos, status de análise e documentos obrigatórios usando autenticação fake por header.
 
 ## Contexto funcional
 
-Empresas e profissionais cadastram projetos digitais para aprovação. Cada projeto pertence a uma empresa e possui documentos obrigatórios para análise. Usuários comuns visualizam projetos vinculados à própria empresa, enquanto usuários com perfil administrativo global possuem uma visão ampla do ambiente.
+Empresas e profissionais cadastram projetos digitais para análise, e cada projeto pertence obrigatoriamente a uma empresa.
 
-O status apresentado na listagem considera a situação dos documentos obrigatórios quando o projeto está em análise.
+A visualização dos projetos deve respeitar o perfil do usuário autenticado:
+
+- Usuários comuns visualizam apenas os projetos vinculados à própria empresa.
+- Usuários com perfil admin podem visualizar projetos de todas as empresas.
+
+Cada projeto possui documentos obrigatórios que precisam ser enviados para que a análise possa avançar. Por isso, o status exibido na interface do projeto pode ser diferente do status real armazenado no projeto.
+
+A regra de exibição do status é:
+
+- Se o projeto estiver com status real "em análise", mas ainda possuir algum documento obrigatório pendente, exibir com o status "documentos pendentes".
+- Se todos os documentos obrigatórios estiverem enviados, a listagem deve exibir o status real do projeto.
+- Para projetos que não estejam "em análise", deve então exibir o status real do projeto.
 
 ## Como rodar com Docker
 
@@ -111,7 +122,13 @@ curl -H "x-user-id: user-north" http://localhost:3000/projects/project-palmeiras
 
 ## Cenário reportado
 
-Foi reportada uma inconsistência no comportamento de visualização de projetos digitais. A listagem de projetos parece respeitar o contexto do usuário autenticado e apresenta uma visão consolidada do status, mas há suspeita de comportamento divergente ao acessar detalhes diretamente pela API. O objetivo é investigar o fluxo, identificar possíveis causas e propor uma correção.
+Foram reportadas duas inconsistências no comportamento de visualização de projetos digitais.
+
+A primeira está relacionada ao contexto do usuário. Em alguns fluxos, os projetos parecem respeitar corretamente o usuário autenticado, mas há suspeita de que esse comportamento não esteja consistente em todas as formas de consulta.
+
+A segunda está relacionada ao status exibido. Em alguns fluxos, o status parece seguir corretamente as regras de exibição, considerando também a situação dos documentos obrigatórios, mas há suspeita de divergência em outras consultas do projeto.
+
+O objetivo é investigar os fluxos, identificar possíveis causas e propor uma correção.
 
 ## Fluxo esperado da aplicação
 
