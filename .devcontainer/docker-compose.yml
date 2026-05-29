@@ -1,0 +1,6 @@
+services:
+  api:
+    volumes:
+      - ..:/app:cached
+      - /app/node_modules
+    command: sleep infinity
